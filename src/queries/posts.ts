@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { useQuery } from '@tanstack/vue-query'
 
-const usePosts = () =>
+export const usePosts = () =>
   useQuery({
     gcTime: 20_000,
     staleTime: 20_000,
@@ -12,7 +12,3 @@ const usePosts = () =>
       return data
     },
   })
-
-export default {
-  usePosts,
-}
