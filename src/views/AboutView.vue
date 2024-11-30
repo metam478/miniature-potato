@@ -1,3 +1,9 @@
+<script setup>
+import postsQueries from '@/queries/posts.ts'
+
+const posts = postsQueries.usePosts()
+</script>
+
 <template>
   <div class="about">
     <h1>This is an about page</h1>
