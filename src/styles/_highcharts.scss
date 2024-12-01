@@ -1,0 +1,15 @@
+@use "variables";
+
+:root {
+  --highcharts-background-color: transparent;
+}
+
+.highcharts-tooltip {
+  &-box {
+    fill: variables.$color-light-400;
+  }
+
+  & text {
+    fill: variables.$color-text-primary;
+  }
+}

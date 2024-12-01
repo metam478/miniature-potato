@@ -1,7 +1,12 @@
 @use "reset";
-@use 'variables';
+@use 'variables' as *;
 @use 'datepicker';
+@use "highcharts";
+@use "container";
+
+@import url('../../node_modules/highcharts/css/highcharts.css');
 
 body {
-  background-color: variables.$color-background-primary;
+  background-color: $color-background-primary;
+    font-family: 'Roboto', sans-serif;
 }

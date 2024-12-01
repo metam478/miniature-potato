@@ -1,11 +1,13 @@
 <script setup lang="ts">
-import DatePicker from '@/components/UI/DatePicker.vue'
-import TSButton from '@/components/UI/TSButton.vue'
+import MaeVsPnlChart from '@/components/charts/MaeVsPnlChart.vue'
+import EvAndWinRate from '@/components/charts/EvAndWinRate.vue'
+import RealVsSimulatedPnlCurve from '@/components/charts/RealVsSimulatedPnlCurve.vue'
 </script>
 
 <template>
-  <main>
-    <DatePicker />
-    <TSButton label="Click me" type="ghost" />
+  <main class="container">
+    <MaeVsPnlChart />
+    <RealVsSimulatedPnlCurve />
+    <EvAndWinRate />
   </main>
 </template>
