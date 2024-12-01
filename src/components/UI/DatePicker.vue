@@ -8,7 +8,7 @@
     :enable-time-picker="false"
   >
     <template #action-row="{ selectDate }">
-      <TSButton :label="$t('apply')" type="primary" @click="selectDate" />
+      <TSButton :label="$t('apply')" @click="selectDate" />
     </template>
 
     <template #left-sidebar>

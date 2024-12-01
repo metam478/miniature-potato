@@ -2,7 +2,7 @@
 withDefaults(
   defineProps<{
     label: string
-    type: 'primary' | 'secondary' | 'ghost'
+    type?: 'primary' | 'secondary' | 'ghost'
   }>(),
   {
     type: 'primary',
