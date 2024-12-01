@@ -4,12 +4,11 @@
     dark
     range
     multi-calendars
-    :preview-format="null"
     :hide-offset-dates="true"
     :enable-time-picker="false"
   >
     <template #action-row="{ selectDate }">
-      <TSButton label="Save" @click="selectDate" />
+      <TSButton :label="$t('apply')" type="primary" @click="selectDate" />
     </template>
 
     <template #left-sidebar>

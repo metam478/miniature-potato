@@ -18,6 +18,7 @@ $color-background-primary: $color-dark-100;
 $color-background-secondary: $color-dark-200;
 $color-border: $color-dark-300;
 
+// Text tokens
 $color-text-primary: $color-light-100;
 $color-text-secondary: $color-light-200;
 $color-text-tertiary: $color-light-300;
@@ -31,8 +32,9 @@ $color-text-button-secondary: $color-light-100;
 $color-background-button-secondary: $color-blue;
 $color-background-button-secondary-hover: darken($color-blue, 10%);
 
-$color-text-button-tertiary: $color-text-secondary;
+$color-text-button-tertiary: $color-light-200;
 $color-background-button-tertiary: $color-dark-200;
 $color-background-button-tertiary-hover: $color-dark-300;
 
+// Input tokens
 $transition-duration: 0.3s;
