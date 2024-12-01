@@ -1,11 +1,12 @@
-import './assets/main.css'
+import '@vuepic/vue-datepicker/dist/main.css'
+import '@/styles/main.scss'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
-import { VueQueryPlugin} from '@tanstack/vue-query'
+import { VueQueryPlugin } from '@tanstack/vue-query'
 
-import App from './App.vue'
-import router from './router'
+import App from '@/App.vue'
+import router from '@/router'
 
 const app = createApp(App)
 

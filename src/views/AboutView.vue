@@ -1,8 +1,9 @@
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import * as echarts from 'echarts'
 
-import {usePosts} from '@/queries/posts.ts'
+import Select from '@/components/UI/Select.vue'
+import { usePosts } from '@/queries/posts.ts'
 
 const posts = usePosts()
 
@@ -13,39 +14,34 @@ const initializeChart = () => {
 
   chart.setOption({
     title: {
-      text: 'ECharts entry example'
+      text: 'ECharts entry example',
     },
     tooltip: {},
     xAxis: {
-      data: ['shirt', 'cardign', 'chiffon', 'pants', 'heels', 'socks']
+      data: ['shirt', 'cardign', 'chiffon', 'pants', 'heels', 'socks'],
     },
     yAxis: {},
-    series: [{
-      name: 'sales',
-      type: 'bar',
-      data: [5, 20, 36, 10, 10, 20]
-    }]
+    series: [
+      {
+        name: 'sales',
+        type: 'bar',
+        data: [5, 20, 36, 10, 10, 20],
+      },
+    ],
   })
 }
 
 onMounted(() => {
   initializeChart()
 })
-
 </script>
 
 <template>
   <div class="about">
-    <div ref="chartRef" style="width: 600px; height: 400px;"></div>
+    <div ref="chartRef" style="width: 600px; height: 400px"></div>
+
+    <Select />
   </div>
 </template>
 
-<style>
-@media (min-width: 1024px) {
-  .about {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-  }
-}
-</style>
+<style></style>

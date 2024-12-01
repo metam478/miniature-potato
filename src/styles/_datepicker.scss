@@ -1,0 +1,9 @@
+@use '@/styles/variables' as variables;
+
+.dp__theme_dark {
+  --dp-background-color: #{variables.$color-dark-200};
+  --dp-text-color: #{variables.$color-light-200};
+    --dp-border-color: transparent;
+  --dp-border-color-hover: transparent;
+  --dp-border-color-focus: transparent;
+}

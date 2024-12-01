@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import TheWelcome from '../components/TheWelcome.vue'
+import DatePicker from '@/components/UI/DatePicker.vue'
+import TSButton from '@/components/UI/TSButton.vue'
 </script>
 
 <template>
   <main>
-    <TheWelcome />
+    <DatePicker />
+    <TSButton label="Click me" type="ghost" />
   </main>
 </template>
