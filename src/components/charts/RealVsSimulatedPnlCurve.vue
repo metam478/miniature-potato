@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { useTemplateRef, ref, watch, watchEffect } from 'vue'
+import { useTemplateRef, ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
+import { QueryObserver, useQueryClient } from '@tanstack/vue-query'
 import Highcharts from 'highcharts'
 import { format } from 'date-fns'
 
@@ -8,7 +9,11 @@ import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
 import ChartContainer from '@/components/ChartContainer.vue'
 
+const queryClient = useQueryClient()
 const stopLossOptimizer = useStopLossOptimizer()
+const stopLossObserver = new QueryObserver(queryClient, {
+  queryKey: ['stop_loss_optimizer'],
+})
 
 const chartContainer = useTemplateRef('chartContainer')
 const stopDistance = ref(5)
@@ -49,6 +54,7 @@ const createChart = () => {
     [],
   )
 
+  // @ts-expect-error useTemplateRef issue
   Highcharts.chart(chartContainer.value, {
     chart: {
       type: 'line',
@@ -74,11 +80,8 @@ const createChart = () => {
     tooltip: {
       shared: true,
       formatter: function (this) {
-        return `
-          <b>Date: ${timestamps[this.x]}</b><br/>
-          Real PnL: $${this.points[0].y.toFixed(2)}<br/>
-          Simulated PnL: $${this.points[1].y.toFixed(2)}
-        `
+        // @ts-expect-error this is not typed
+        return `<b>Date: ${timestamps[this.x]}</b><br/> Real PnL: $${this.points[0].y.toFixed(2)}<br/>Simulated PnL: $${this.points[1].y.toFixed(2)}`
       },
     },
     series: [
@@ -102,13 +105,12 @@ const createChart = () => {
 
 const debouncedCreateChart = useDebounceFn(createChart, 500)
 
-watch([stopDistance], () => {
-  debouncedCreateChart()
+stopLossObserver.subscribe(() => {
+  createChart()
 })
 
-watchEffect(() => {
-  createChart()
-  console.log('stopLossOptimizer', stopLossOptimizer)
+watch([stopDistance], () => {
+  debouncedCreateChart()
 })
 </script>
 
@@ -116,8 +118,8 @@ watchEffect(() => {
   <!--  <input type="number" v-model="stopDistance" />-->
 
   <ChartContainer
-    :title="$t('mae_vs_pnl_chart_title')"
-    :is-loading="Boolean(stopLossOptimizer.isLoading)"
+    :title="$t('real_vs_simulated_pnl_curve_chart_title')"
+    :is-loading="stopLossOptimizer.isLoading.value"
   >
     <template #default>
       <div id="chart" ref="chartContainer"></div>

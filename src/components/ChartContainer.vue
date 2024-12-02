@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { defineProps, withDefaults } from 'vue'
 import IInfo from '@/components/icons/IInfo.vue'
 
 withDefaults(
   defineProps<{
     title: string
     tooltip?: string
-    isLoading?: boolean
+    isLoading?: boolean | undefined
   }>(),
   {
     tooltip: 'Some info',
@@ -22,9 +23,11 @@ withDefaults(
     </div>
 
     <div class="default-slot-container">
-      <!--      <div v-if="isLoading" class="skeleton-loader"></div>-->
+      <div v-show="isLoading" class="skeleton-loader"></div>
 
-      <slot></slot>
+      <div v-show="!isLoading">
+        <slot></slot>
+      </div>
     </div>
   </div>
 </template>

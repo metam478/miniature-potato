@@ -10,8 +10,9 @@ const stopLossOptimizer = useStopLossOptimizer()
 const chartContainer = useTemplateRef('chartContainer')
 
 const createChart = () => {
-  if (!stopLossOptimizer.data.value) return
+  if (!stopLossOptimizer.data.value || !chartContainer.value) return
 
+  // @ts-expect-error useTemplateRef issue
   Highcharts.chart(chartContainer.value, {
     chart: {
       type: 'line',
@@ -69,7 +70,10 @@ watchEffect(() => {
 </script>
 
 <template>
-  <ChartContainer :title="$t('ev_and_win_rate_chart_title')">
+  <ChartContainer
+    :title="$t('ev_and_win_rate_chart_title')"
+    :is-loading="stopLossOptimizer.isLoading.value"
+  >
     <template #default>
       <div id="chart" ref="chartContainer"></div>
     </template>

@@ -22,3 +22,13 @@ export const useStopLossOptimizer = () =>
       return JSON.parse(sanitizedData).data
     },
   })
+
+export const usePokemon = () =>
+  useQuery({
+    gcTime: 20_000,
+    staleTime: 20_000,
+    queryKey: ['posts'],
+
+    queryFn: async () =>
+      await fetch('https://jsonplaceholder.typicode.com/posts').then((response) => response.json()),
+  })

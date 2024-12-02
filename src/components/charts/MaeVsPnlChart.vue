@@ -29,6 +29,7 @@ const scatterData = computed(() => {
 })
 
 const createChart = () => {
+  // @ts-expect-error useTemplateRef issue
   Highcharts.chart(chartContainer.value, {
     chart: {
       type: 'scatter',
@@ -114,16 +115,19 @@ watchEffect(() => {
     <div>
       <p>
         Current Expected Value per Trade:
-        {{ stopLossOptimizer?.data?.value?.data?.optimal_stop?.current_ev }}
+        {{ stopLossOptimizer?.data?.value?.optimal_stop?.current_ev }}
       </p>
       <p>
         Expected Value after Stop Loss:
-        {{ stopLossOptimizer?.data?.value?.data?.optimal_stop?.improved_ev }}
+        {{ stopLossOptimizer?.data?.value?.optimal_stop?.improved_ev }}
       </p>
       <p>Stoploss Distance: {{ stopLoss }}</p>
     </div>
 
-    <ChartContainer :title="$t('real_vs_simulated_pnl_curve_chart_title')">
+    <ChartContainer
+      :title="$t('mae_vs_pnl_chart_title')"
+      :is-loading="stopLossOptimizer.isLoading.value"
+    >
       <template #default>
         <div id="chart" ref="chartContainer"></div>
       </template>
