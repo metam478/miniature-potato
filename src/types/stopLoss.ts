@@ -1,9 +1,4 @@
-export type StopLossOptimizerParams = {
-  session_id: string
-  uid: string
-}
-
-export type OptimalStop = {
+export interface OptimalStop {
   affected_trades_pct: number
   current_ev: number
   ev_improvement_pct: number
@@ -11,7 +6,7 @@ export type OptimalStop = {
   optimal_stoploss: number
 }
 
-export type Trade = {
+export interface Trade {
   entry_exit_delta: number
   fees: number
   mae_percent: number
@@ -20,7 +15,7 @@ export type Trade = {
   timestamp: number
 }
 
-export type StopLossOptimizerResponse = {
+export interface StopLossOptimizerResponse {
   ev_by_mae: number[]
   mae_ticks: number[]
   optimal_stop: OptimalStop

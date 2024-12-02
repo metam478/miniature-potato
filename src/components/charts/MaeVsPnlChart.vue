@@ -6,6 +6,7 @@ import Highcharts from 'highcharts'
 import ChartContainer from '@/components/ChartContainer.vue'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
+import type { ExtendedPoint } from '@/types/highcharts.ts'
 import { format } from 'date-fns'
 
 const stopLossOptimizer = useStopLossOptimizer()
@@ -59,12 +60,92 @@ const formatData = () => {
 }
 
 const createChart = () => {
+  console.log('stoploss.value', stopLoss.value)
   // @ts-expect-error useTemplateRef issue
   Highcharts.chart(chartContainer.value, {
     chart: {
       type: 'scatter',
-      zoomType: 'xy',
       height: '400px',
+      events: {
+        load: function () {
+          // eslint-disable-next-line @typescript-eslint/no-this-alias
+          const chart = this
+          const lineWidth = 3
+          const handleHeight = 48
+          const handleWidth = 12
+
+          const draggableLine = chart.renderer
+            .g()
+            .attr({
+              translateX: chart.plotLeft + chart.plotWidth / 2,
+            })
+            .add()
+
+          chart.renderer
+            .path(['M', 0, 0, 'L', 0, chart.plotHeight])
+            .attr({
+              'stroke-width': lineWidth,
+              'pointer-events': 'all',
+              cursor: 'ew-resize',
+              stroke: 'lightgray',
+            })
+            .add(draggableLine)
+
+          chart.renderer
+            .rect(
+              -handleWidth / 2,
+              (chart.plotHeight - handleHeight) / 2,
+              handleWidth,
+              handleHeight,
+              4,
+            )
+            .attr({
+              fill: 'lightgray',
+              'pointer-events': 'all',
+              cursor: 'ew-resize',
+            })
+            .add(draggableLine)
+
+          let isDragging = false
+
+          const dragStart = function (e: MouseEvent) {
+            e.preventDefault()
+            isDragging = true
+            chart.container.style.cursor = 'ew-resize'
+          }
+
+          const dragMove = function (e: MouseEvent) {
+            if (isDragging) {
+              e.preventDefault()
+              const normalizedEvent = chart.pointer.normalize(e)
+              const newX = Math.min(
+                Math.max(chart.plotLeft, normalizedEvent.chartX),
+                chart.plotLeft + chart.plotWidth,
+              )
+
+              draggableLine.attr({
+                translateX: newX,
+              })
+
+              stopLoss.value = +chart.xAxis[0].toValue(newX).toFixed(3)
+            }
+          }
+
+          const dragEnd = function (e: MouseEvent) {
+            e.preventDefault()
+            isDragging = false
+            chart.container.style.cursor = 'default'
+          }
+
+          draggableLine.element.addEventListener('mousedown', dragStart as EventListener)
+          document.addEventListener('mousemove', dragMove)
+          document.addEventListener('mouseup', dragEnd)
+
+          draggableLine.element.addEventListener('touchstart', dragStart as EventListener)
+          document.addEventListener('touchmove', dragMove as EventListener)
+          document.addEventListener('touchend', dragEnd as EventListener)
+        },
+      },
     },
     title: {
       text: null,
@@ -88,9 +169,9 @@ const createChart = () => {
       },
     },
     tooltip: {
-      formatter: function () {
+      formatter: function (this: ExtendedPoint) {
         return `<b>MAE:</b> ${this.x.toFixed(2)}%<br/>
-                <b>PnL:</b> ${showPercentage.value ? `${this.y.toFixed(2)}%` : `$${this.y.toFixed(2)}`}<br/>
+                <b>PnL:</b> ${showPercentage.value ? `${this.y?.toFixed(2)}%` : `$${this.y?.toFixed(2)}`}<br/>
                 <b>Date:</b> ${format(new Date(this.point.timestamp), 'MMM d yyyy')}`
       },
     },
@@ -109,74 +190,33 @@ const createChart = () => {
           },
         })),
       },
-      // {
-      //   name: 'Stop Loss Line',
-      //   type: 'line',
-      //   color: '#ff0000',
-      //   dashStyle: 'Dash',
-      //   data: [
-      //     [currentStopLoss, -10000],
-      //     [currentStopLoss, 10000],
-      //   ],
-      //   enableMouseTracking: false,
-      // },
     ],
   })
 }
 
 const debouncedCreateChart = useDebounceFn(createChart, 500)
 
-watch([stopLoss, useDollars], () => {
+watch([useDollars], () => {
   debouncedCreateChart()
 })
 
 watchEffect(() => {
   if (!stopLossOptimizer?.data?.value) return
   stopLoss.value = stopLossOptimizer.data.value.optimal_stop.optimal_stoploss
+  debouncedCreateChart()
 })
 </script>
 
 <template>
   <div style="color: white">
-    {{ maxMAE }}
     <div>
-      <label for="stopLossSlider">Stoploss Distance: {{ stopLoss }}</label>
-      <input
-        type="range"
-        id="stopLossSlider"
-        v-model="stopLoss"
-        :min="0"
-        :max="maxMAE"
-        step="0.01"
-      />
-    </div>
+      <h3>Optimal Stop Loss: {{ stopLossOptimizer.data.value?.optimal_stop.optimal_stoploss }}</h3>
 
-    <div>
-      <label>
-        <input type="checkbox" v-model="useDollars" />
-        Use Dollars
-      </label>
-    </div>
-
-    <div>
-      <p>
-        Current Expected Value per Trade:
-        {{ stopLossOptimizer?.data?.value?.optimal_stop?.current_ev }}
-      </p>
-      <p>
-        Expected Value after Stop Loss:
-        {{ stopLossOptimizer?.data?.value?.optimal_stop?.improved_ev }}
-      </p>
-      <p>Stoploss Distance: {{ stopLoss }}</p>
-    </div>
-
-    <div>
-      <h3>Optimal Stop Loss</h3>
-      <p>{data.optimal_stop.optimal_stoploss}%</p>
       <h3>Expected Value</h3>
-      <p>Current: {{ metrics.current_ev?.toFixed(2) }}/trade</p>
-      <p>Improved: {{ metrics.improved_ev?.toFixed(2) }}/trade</p>
-      <p>Improvement: {{ metrics.ev_improvement_pct?.toFixed(1) }}%</p>
+      <p>Max MAE: {{ maxMAE }}</p>
+      <p>Current expected value per trade: {{ metrics.current_ev?.toFixed(2) }}$ per trade</p>
+      <p>Expected value after stop loss: {{ metrics.improved_ev?.toFixed(2) }}$ per trade</p>
+      <p>Expected value after stop loss: {{ metrics.ev_improvement_pct?.toFixed(1) }}%</p>
       <p>Affected Trades: {{ metrics.affected_trades_pct?.toFixed(1) }}%</p>
     </div>
 
