@@ -7,7 +7,6 @@ import { createI18n } from 'vue-i18n'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import FloatingVue from 'floating-vue'
 import Highcharts from 'highcharts'
-import HighchartsMore from 'highcharts/highcharts-more'
 import HighChartsVue from 'highcharts-vue'
 
 import App from '@/App.vue'
@@ -21,8 +20,6 @@ const i18n = createI18n({
     en,
   },
 })
-
-// HighchartsMore(Highcharts)
 
 const app = createApp(App)
 
