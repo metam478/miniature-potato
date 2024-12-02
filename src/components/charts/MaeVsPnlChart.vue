@@ -6,6 +6,7 @@ import {
   Chart as HighchartsChart,
   type Options,
   type Point,
+  type SeriesOptionsType,
   type SeriesScatterOptions,
 } from 'highcharts'
 import { Chart } from 'highcharts-vue'
@@ -64,6 +65,25 @@ const formatData = () => {
   }))
 }
 
+const chartSeries = computed(() => {
+  return stopLossOptimizer?.data?.value
+    ? [
+        {
+          type: 'scatter',
+          name: 'Trades',
+          data: formatData()?.map((point) => ({
+            x: point.x,
+            y: point.y,
+            timestamp: point.timestamp,
+            marker: {
+              fillColor: point.color,
+            },
+          })),
+        } as SeriesScatterOptions,
+      ]
+    : []
+})
+
 const chartOptions = ref<Options>({
   chart: {
     type: 'scatter',
@@ -84,7 +104,7 @@ const chartOptions = ref<Options>({
           .add()
 
         chart.renderer
-          .path(['M', 0, 0, 'L', 0, chart.plotHeight] as unknown)
+          .path(['M', 0, 0, 'L', 0, chart.plotHeight] as never)
           .attr({
             'stroke-width': lineWidth,
             'pointer-events': 'all',
@@ -182,28 +202,12 @@ const chartOptions = ref<Options>({
   legend: {
     enabled: false,
   },
-  series: [],
+  series: chartSeries as unknown as SeriesOptionsType[],
 })
 
 watchEffect(() => {
   if (!stopLossOptimizer?.data?.value) return
   stopLoss.value = stopLossOptimizer.data.value.optimal_stop.optimal_stoploss
-
-  if (!chartOptions.value.series) return
-  chartOptions.value.series = [
-    {
-      type: 'scatter',
-      name: 'Trades',
-      data: formatData()?.map((point) => ({
-        x: point.x,
-        y: point.y,
-        timestamp: point.timestamp,
-        marker: {
-          fillColor: point.color,
-        },
-      })),
-    } as SeriesScatterOptions,
-  ]
 })
 </script>
 
@@ -226,7 +230,6 @@ watchEffect(() => {
     >
       <template #default>
         <chart :options="chartOptions"></chart>
-        <!--        <div id="chart" ref="chartContainer"></div>-->
       </template>
     </ChartContainer>
   </div>

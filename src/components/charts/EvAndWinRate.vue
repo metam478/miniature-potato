@@ -1,71 +1,75 @@
 <script setup lang="ts">
-import { useTemplateRef, watchEffect } from 'vue'
-import Highcharts from 'highcharts'
+import { ref, computed } from 'vue'
+import { type Options, type SeriesOptionsType } from 'highcharts'
+import { Chart } from 'highcharts-vue'
 
 import ChartContainer from '@/components/ChartContainer.vue'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
-
 const stopLossOptimizer = useStopLossOptimizer()
 
-const chartContainer = useTemplateRef('chartContainer')
+const stopLossOptimizerSeries = computed(() => {
+  if (!stopLossOptimizer?.data?.value) return []
 
-const createChart = () => {
-  if (!stopLossOptimizer.data.value || !chartContainer.value) return
+  return [
+    {
+      name: 'Expected Value (EV)',
+      data: stopLossOptimizer.data.value.ev_by_mae,
+      yAxis: 0,
+    },
+    {
+      name: 'Win Rate %',
+      data: stopLossOptimizer.data.value.recovery_rate_by_mae.map((rate: number) => rate * 100),
+      yAxis: 1,
+    },
+  ]
+})
 
-  // @ts-expect-error useTemplateRef issue
-  Highcharts.chart(chartContainer.value, {
-    chart: {
-      type: 'line',
-    },
-    title: null,
-    xAxis: {
-      categories: stopLossOptimizer.data.value.mae_ticks.map(
-        (tick: number) => Number(tick * 100).toFixed(1) + '%',
-      ),
-      tickInterval: Math.floor(stopLossOptimizer.data.value.mae_ticks.length / 20),
-    },
-    yAxis: [
-      {
-        title: null,
-        labels: {
-          formatter: function () {
-            return '$' + this.value.toLocaleString('en-US')
-          },
+const chartTickInterval = computed(() =>
+  stopLossOptimizer.data.value
+    ? Math.floor(stopLossOptimizer.data.value?.mae_ticks?.length / 20)
+    : 0,
+)
+
+const chartOptions = ref<Options>({
+  chart: {
+    type: 'line',
+  },
+  title: {
+    text: undefined,
+  },
+  xAxis: {
+    categories: stopLossOptimizer.data.value?.mae_ticks.map(
+      (tick: number) => Number(tick * 100).toFixed(1) + '%',
+    ),
+    tickInterval: chartTickInterval.value,
+  },
+  yAxis: [
+    {
+      title: undefined,
+      labels: {
+        formatter: function () {
+          return '$' + this.value.toLocaleString('en-US')
         },
       },
-      {
-        title: null,
-        opposite: true,
-        labels: {
-          formatter: function () {
-            return this.value + '%'
-          },
+    },
+    {
+      title: undefined,
+      opposite: true,
+      labels: {
+        formatter: function () {
+          return this.value + '%'
         },
       },
-    ],
-    tooltip: {
-      shared: true,
-      formatter: function () {
-        return `<div><b>MAE %: ${this.key}</b><br/>EV: $${this.points[0].y.toLocaleString('en-US')}<br/>Win Rate: ${Number(this.points[1].y).toFixed(2)}%`
-      },
     },
-    series: [
-      {
-        name: 'Expected Value (EV)',
-        data: stopLossOptimizer.data.value.ev_by_mae,
-        yAxis: 0,
-      },
-      {
-        name: 'Win Rate %',
-        data: stopLossOptimizer.data.value.recovery_rate_by_mae.map((rate: number) => rate * 100),
-        yAxis: 1,
-      },
-    ],
-  })
-}
-
-watchEffect(() => {
-  createChart()
+  ],
+  tooltip: {
+    shared: true,
+    formatter: function () {
+      // @ts-expect-error add custom points interface
+      return `<div><b>MAE %: ${this.key}</b><br/>EV: $${this.points[0].y.toLocaleString('en-US')}<br/>Win Rate: ${Number(this.points[1].y).toFixed(2)}%`
+    },
+  },
+  series: stopLossOptimizerSeries as unknown as SeriesOptionsType[],
 })
 </script>
 
@@ -75,7 +79,7 @@ watchEffect(() => {
     :is-loading="stopLossOptimizer.isLoading.value"
   >
     <template #default>
-      <div id="chart" ref="chartContainer"></div>
+      <chart :options="chartOptions"></chart>
     </template>
   </ChartContainer>
 </template>
