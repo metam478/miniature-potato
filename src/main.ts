@@ -8,6 +8,7 @@ import { createI18n } from 'vue-i18n'
 import { VueQueryPlugin } from '@tanstack/vue-query'
 import FloatingVue from 'floating-vue'
 import Highcharts from 'highcharts'
+import HighChartsVue from 'highcharts-vue'
 
 import App from '@/App.vue'
 import router from '@/router'
@@ -41,6 +42,7 @@ Highcharts.setOptions({
 app.use(i18n)
 app.use(createPinia())
 app.use(FloatingVue)
+app.use(HighChartsVue)
 app.use(VueQueryPlugin)
 app.use(router)
 

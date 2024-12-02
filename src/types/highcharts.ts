@@ -1,7 +1,5 @@
-import { Point } from 'highcharts'
+import { type PointOptionsObject } from 'highcharts'
 
-export interface ExtendedPoint extends Point {
-  point: {
-    timestamp: number
-  }
+export interface ExtendedPoint extends PointOptionsObject {
+  timestamp: number
 }

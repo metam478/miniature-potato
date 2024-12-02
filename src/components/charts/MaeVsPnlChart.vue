@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import { useTemplateRef, ref, computed, watch, watchEffect } from 'vue'
-import { refThrottled, useDebounceFn } from '@vueuse/core'
-import Highcharts from 'highcharts'
+import { ref, computed, watchEffect } from 'vue'
+import { refThrottled } from '@vueuse/core'
+import { format } from 'date-fns'
+import {
+  Chart as HighchartsChart,
+  type Options,
+  type Point,
+  type SeriesScatterOptions,
+} from 'highcharts'
+import { Chart } from 'highcharts-vue'
 
 import ChartContainer from '@/components/ChartContainer.vue'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
 import type { ExtendedPoint } from '@/types/highcharts.ts'
-import { format } from 'date-fns'
 
 const stopLossOptimizer = useStopLossOptimizer()
 
-const chartContainer = useTemplateRef('chartContainer')
-const useDollars = ref(false)
+// const useDollars = ref(false)
 const stopLoss = ref(0)
 const stopLossThrottled = refThrottled(stopLoss, 50)
 const showPercentage = ref(false)
@@ -59,151 +64,146 @@ const formatData = () => {
   }))
 }
 
-const createChart = () => {
-  console.log('stoploss.value', stopLoss.value)
-  // @ts-expect-error useTemplateRef issue
-  Highcharts.chart(chartContainer.value, {
-    chart: {
-      type: 'scatter',
-      height: '400px',
-      events: {
-        load: function () {
-          // eslint-disable-next-line @typescript-eslint/no-this-alias
-          const chart = this
-          const lineWidth = 3
-          const handleHeight = 48
-          const handleWidth = 12
+const chartOptions = ref<Options>({
+  chart: {
+    type: 'scatter',
+    height: '400px',
+    events: {
+      load: function (this: HighchartsChart) {
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const chart = this
+        const lineWidth = 3
+        const handleHeight = 48
+        const handleWidth = 12
 
-          const draggableLine = chart.renderer
-            .g()
-            .attr({
-              translateX: chart.plotLeft + chart.plotWidth / 2,
-            })
-            .add()
+        const draggableLine = chart.renderer
+          .g()
+          .attr({
+            translateX: chart.plotLeft + chart.plotWidth / 2,
+          })
+          .add()
 
-          chart.renderer
-            .path(['M', 0, 0, 'L', 0, chart.plotHeight])
-            .attr({
-              'stroke-width': lineWidth,
-              'pointer-events': 'all',
-              cursor: 'ew-resize',
-              stroke: 'lightgray',
-            })
-            .add(draggableLine)
+        chart.renderer
+          .path(['M', 0, 0, 'L', 0, chart.plotHeight] as unknown)
+          .attr({
+            'stroke-width': lineWidth,
+            'pointer-events': 'all',
+            cursor: 'ew-resize',
+            stroke: 'lightgray',
+          })
+          .add(draggableLine)
 
-          chart.renderer
-            .rect(
-              -handleWidth / 2,
-              (chart.plotHeight - handleHeight) / 2,
-              handleWidth,
-              handleHeight,
-              4,
+        chart.renderer
+          .rect(
+            -handleWidth / 2,
+            (chart.plotHeight - handleHeight) / 2,
+            handleWidth,
+            handleHeight,
+            4,
+          )
+          .attr({
+            fill: 'lightgray',
+            'pointer-events': 'all',
+            cursor: 'ew-resize',
+          })
+          .add(draggableLine)
+
+        let isDragging = false
+
+        const dragStart = function (e: MouseEvent) {
+          e.preventDefault()
+          isDragging = true
+          chart.container.style.cursor = 'ew-resize'
+        }
+
+        const dragMove = function (e: MouseEvent) {
+          if (isDragging) {
+            e.preventDefault()
+            const normalizedEvent = chart.pointer.normalize(e)
+            const newX = Math.min(
+              Math.max(chart.plotLeft, normalizedEvent.chartX),
+              chart.plotLeft + chart.plotWidth,
             )
-            .attr({
-              fill: 'lightgray',
-              'pointer-events': 'all',
-              cursor: 'ew-resize',
+
+            draggableLine.attr({
+              translateX: newX,
             })
-            .add(draggableLine)
 
-          let isDragging = false
-
-          const dragStart = function (e: MouseEvent) {
-            e.preventDefault()
-            isDragging = true
-            chart.container.style.cursor = 'ew-resize'
+            stopLoss.value = +chart.xAxis[0].toValue(newX).toFixed(3)
           }
+        }
 
-          const dragMove = function (e: MouseEvent) {
-            if (isDragging) {
-              e.preventDefault()
-              const normalizedEvent = chart.pointer.normalize(e)
-              const newX = Math.min(
-                Math.max(chart.plotLeft, normalizedEvent.chartX),
-                chart.plotLeft + chart.plotWidth,
-              )
+        const dragEnd = function (e: MouseEvent) {
+          e.preventDefault()
+          isDragging = false
+          chart.container.style.cursor = 'default'
+        }
 
-              draggableLine.attr({
-                translateX: newX,
-              })
+        draggableLine.element.addEventListener('mousedown', dragStart as EventListener)
+        document.addEventListener('mousemove', dragMove)
+        document.addEventListener('mouseup', dragEnd)
 
-              stopLoss.value = +chart.xAxis[0].toValue(newX).toFixed(3)
-            }
-          }
-
-          const dragEnd = function (e: MouseEvent) {
-            e.preventDefault()
-            isDragging = false
-            chart.container.style.cursor = 'default'
-          }
-
-          draggableLine.element.addEventListener('mousedown', dragStart as EventListener)
-          document.addEventListener('mousemove', dragMove)
-          document.addEventListener('mouseup', dragEnd)
-
-          draggableLine.element.addEventListener('touchstart', dragStart as EventListener)
-          document.addEventListener('touchmove', dragMove as EventListener)
-          document.addEventListener('touchend', dragEnd as EventListener)
-        },
+        draggableLine.element.addEventListener('touchstart', dragStart as EventListener)
+        document.addEventListener('touchmove', dragMove as EventListener)
+        document.addEventListener('touchend', dragEnd as EventListener)
       },
     },
+  },
+  title: {
+    text: undefined,
+  },
+  xAxis: {
     title: {
-      text: null,
+      text: 'MAE (%)',
     },
-    xAxis: {
-      title: {
-        text: 'MAE (%)',
-      },
-      min: 0,
+    min: 0,
+  },
+  yAxis: {
+    title: {
+      text: `PnL (${showPercentage.value ? '%' : '$'})`,
     },
-    yAxis: {
-      title: {
-        text: `PnL (${showPercentage.value ? '%' : '$'})`,
-      },
-    },
-    plotOptions: {
-      scatter: {
-        marker: {
-          radius: 5,
-        },
+  },
+  plotOptions: {
+    scatter: {
+      marker: {
+        radius: 5,
       },
     },
-    tooltip: {
-      formatter: function (this: ExtendedPoint) {
-        return `<b>MAE:</b> ${this.x.toFixed(2)}%<br/>
+  },
+  tooltip: {
+    formatter: function (this: Point) {
+      const point = this.options as ExtendedPoint
+
+      return `<b>MAE:</b> ${this.x.toFixed(2)}%<br/>
                 <b>PnL:</b> ${showPercentage.value ? `${this.y?.toFixed(2)}%` : `$${this.y?.toFixed(2)}`}<br/>
-                <b>Date:</b> ${format(new Date(this.point.timestamp), 'MMM d yyyy')}`
-      },
+                <b>Date:</b> ${format(new Date(point.timestamp), 'MMM d yyyy')}`
     },
-    legend: {
-      enabled: false,
-    },
-    series: [
-      {
-        name: 'Trades',
-        data: formatData()?.map((point) => ({
-          x: point.x,
-          y: point.y,
-          timestamp: point.timestamp,
-          marker: {
-            fillColor: point.color,
-          },
-        })),
-      },
-    ],
-  })
-}
-
-const debouncedCreateChart = useDebounceFn(createChart, 500)
-
-watch([useDollars], () => {
-  debouncedCreateChart()
+  },
+  legend: {
+    enabled: false,
+  },
+  series: [],
 })
 
 watchEffect(() => {
   if (!stopLossOptimizer?.data?.value) return
   stopLoss.value = stopLossOptimizer.data.value.optimal_stop.optimal_stoploss
-  debouncedCreateChart()
+
+  if (!chartOptions.value.series) return
+  chartOptions.value.series = [
+    {
+      type: 'scatter',
+      name: 'Trades',
+      data: formatData()?.map((point) => ({
+        x: point.x,
+        y: point.y,
+        timestamp: point.timestamp,
+        marker: {
+          fillColor: point.color,
+        },
+      })),
+    } as SeriesScatterOptions,
+  ]
 })
 </script>
 
@@ -225,7 +225,8 @@ watchEffect(() => {
       :is-loading="stopLossOptimizer.isLoading.value"
     >
       <template #default>
-        <div id="chart" ref="chartContainer"></div>
+        <chart :options="chartOptions"></chart>
+        <!--        <div id="chart" ref="chartContainer"></div>-->
       </template>
     </ChartContainer>
   </div>
