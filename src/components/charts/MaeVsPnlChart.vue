@@ -11,6 +11,7 @@ import {
 } from 'highcharts'
 import { Chart } from 'highcharts-vue'
 
+import TSCheckbox from '@/components/UI/TSCheckbox.vue'
 import ChartContainer from '@/components/ChartContainer.vue'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
@@ -18,10 +19,9 @@ import type { ExtendedPoint } from '@/types/highcharts.ts'
 
 const stopLossOptimizer = useStopLossOptimizer()
 
-// const useDollars = ref(false)
 const stopLoss = ref(0)
 const stopLossThrottled = refThrottled(stopLoss, 50)
-const showPercentage = ref(false)
+const useDollars = ref(true)
 
 const maxMAE = computed(() => {
   if (!stopLossOptimizer?.data?.value) return 0
@@ -59,7 +59,7 @@ const metrics = computed(() => {
 const formatData = () => {
   return stopLossOptimizer.data.value?.trades.map((trade: Trade) => ({
     x: trade.mae_percent,
-    y: showPercentage.value ? trade.pnl_percent : trade.pnl_usd,
+    y: useDollars.value ? trade.pnl_usd : trade.pnl_percent,
     timestamp: trade.timestamp,
     color: trade.pnl_usd >= 0 ? '#22c55e' : '#ef4444',
   }))
@@ -180,7 +180,7 @@ const chartOptions = ref<Options>({
   },
   yAxis: {
     title: {
-      text: `PnL (${showPercentage.value ? '%' : '$'})`,
+      text: `PnL (${useDollars.value ? '$' : '%'})`,
     },
   },
   plotOptions: {
@@ -194,8 +194,8 @@ const chartOptions = ref<Options>({
     formatter: function (this: Point) {
       const point = this.options as ExtendedPoint
 
-      return `<b>MAE:</b> ${this.x.toFixed(2)}%<br/>
-                <b>PnL:</b> ${showPercentage.value ? `${this.y?.toFixed(2)}%` : `$${this.y?.toFixed(2)}`}<br/>
+      return `<b>MAE:</b> ${this.x.toFixed(4)}%<br/>
+                <b>PnL:</b> ${useDollars.value ? '$' : ''}${this.y?.toFixed(useDollars.value ? 2 : 4)}${useDollars.value ? '' : '%'}<br/>
                 <b>Date:</b> ${format(new Date(point.timestamp), 'MMM d yyyy')}`
     },
   },
@@ -214,27 +214,28 @@ watchEffect(() => {
 <template>
   <div>
     <div class="card">
-      <h3>Optimal Stop Loss: {{ stopLossOptimizer.data.value?.optimal_stop.optimal_stoploss }}</h3>
+      <h3>
+        {{ $t('optimal_stop_loss') }}}:
+        {{ stopLossOptimizer.data.value?.optimal_stop.optimal_stoploss }}
+      </h3>
 
-      <h3>Expected Value</h3>
+      <h3>{{ $t('expected_value') }}</h3>
       <p>
-        Max MAE: <span class="card__value-label">{{ maxMAE.toFixed(2) }}%</span>
+        {{ $t('max_mae') }}: <span class="card__value-label">{{ maxMAE.toFixed(2) }}%</span>
       </p>
       <p>
-        Current expected value per trade:
+        {{ $t('current_expected_value_per_trade') }}}
         <span class="card__value-label">{{ metrics.current_ev?.toFixed(2) }}$</span>
-        per trade
       </p>
       <p>
-        Expected value after stop loss:
-        <span class="card__value-label">{{ metrics.improved_ev?.toFixed(2) }}$</span> per trade
+        {{ $t('expected_value_after_stop_loss') }}
+        <span class="card__value-label">
+          <span v-if="useDollars">{{ metrics.improved_ev?.toFixed(2) }}$</span>
+          <span v-else>{{ metrics.ev_improvement_pct?.toFixed(1) }}%</span>
+        </span>
       </p>
       <p>
-        Expected value after stop loss:
-        <span class="card__value-label">{{ metrics.ev_improvement_pct?.toFixed(1) }}%</span>
-      </p>
-      <p>
-        Affected Trades:
+        {{ $t('affected_trades') }}
         <span class="card__value-label">{{ metrics.affected_trades_pct?.toFixed(1) }}%</span>
       </p>
     </div>
@@ -243,6 +244,9 @@ watchEffect(() => {
       :title="$t('mae_vs_pnl_chart_title')"
       :is-loading="stopLossOptimizer.isLoading.value"
     >
+      <template #actions>
+        <TSCheckbox v-model="useDollars" :text="$t('use_dollars')" />
+      </template>
       <template #default>
         <chart :options="chartOptions"></chart>
       </template>

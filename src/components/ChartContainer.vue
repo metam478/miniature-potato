@@ -19,7 +19,11 @@ withDefaults(
   <div class="chart-container">
     <div class="chart-container__header">
       <h4 class="chart-container__title">{{ title }}</h4>
-      <IInfo v-tooltip="tooltip" />
+
+      <div style="display: flex; gap: 1rem">
+        <slot name="actions" v-if="$slots.actions"> </slot>
+        <IInfo v-tooltip="tooltip" />
+      </div>
     </div>
 
     <div class="default-slot-container">

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useTemplateRef, ref, watch } from 'vue'
 import { useDebounceFn } from '@vueuse/core'
+import { useI18n } from 'vue-i18n'
 import { QueryObserver, useQueryClient } from '@tanstack/vue-query'
 import Highcharts from 'highcharts'
 import { format } from 'date-fns'
@@ -9,6 +10,7 @@ import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
 import ChartContainer from '@/components/ChartContainer.vue'
 
+const { t } = useI18n()
 const queryClient = useQueryClient()
 const stopLossOptimizer = useStopLossOptimizer()
 const stopLossObserver = new QueryObserver(queryClient, {
@@ -63,13 +65,13 @@ const createChart = () => {
     xAxis: {
       categories: timestamps,
       title: {
-        text: 'Date',
+        text: t('date'),
       },
       tickInterval: Math.floor(timestamps.length / 10),
     },
     yAxis: {
       title: {
-        text: 'Cumulative PnL (USD)',
+        text: `${t('cumulative_pnl')} (USD)`,
       },
       labels: {
         formatter: function () {
@@ -80,20 +82,20 @@ const createChart = () => {
     tooltip: {
       shared: true,
       formatter: function (this) {
-        // @ts-expect-error this is not typed
-        return `<b>Date: ${timestamps[this.x]}</b><br/> Real PnL: $${this.points[0].y.toFixed(2)}<br/>Simulated PnL: $${this.points[1].y.toFixed(2)}`
+        // @ts-expect-error points is not typed
+        return `<b>${t('date')}: ${timestamps[this.x]}</b><br/> ${t('real_pnl')}: $${this.points[0].y.toFixed(2)}<br/>${t('simulated_pnl')}: $${this.points[1].y.toFixed(2)}`
       },
     },
     series: [
       {
-        name: 'Real PnL',
+        name: t('real_pnl'),
         data: cumulativeRealPnL,
         marker: {
           enabled: false,
         },
       },
       {
-        name: 'Simulated PnL',
+        name: t('simulated_pnl'),
         data: cumulativeSimulatedPnL,
         marker: {
           enabled: false,
