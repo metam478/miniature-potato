@@ -212,16 +212,31 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div style="color: white">
-    <div>
+  <div>
+    <div class="info-box">
       <h3>Optimal Stop Loss: {{ stopLossOptimizer.data.value?.optimal_stop.optimal_stoploss }}</h3>
 
       <h3>Expected Value</h3>
-      <p>Max MAE: {{ maxMAE }}</p>
-      <p>Current expected value per trade: {{ metrics.current_ev?.toFixed(2) }}$ per trade</p>
-      <p>Expected value after stop loss: {{ metrics.improved_ev?.toFixed(2) }}$ per trade</p>
-      <p>Expected value after stop loss: {{ metrics.ev_improvement_pct?.toFixed(1) }}%</p>
-      <p>Affected Trades: {{ metrics.affected_trades_pct?.toFixed(1) }}%</p>
+      <p>
+        Max MAE: <span class="info-box__value-label">{{ maxMAE.toFixed(2) }}%</span>
+      </p>
+      <p>
+        Current expected value per trade:
+        <span class="info-box__value-label">{{ metrics.current_ev?.toFixed(2) }}$</span>
+        per trade
+      </p>
+      <p>
+        Expected value after stop loss:
+        <span class="info-box__value-label">{{ metrics.improved_ev?.toFixed(2) }}$</span> per trade
+      </p>
+      <p>
+        Expected value after stop loss:
+        <span class="info-box__value-label">{{ metrics.ev_improvement_pct?.toFixed(1) }}%</span>
+      </p>
+      <p>
+        Affected Trades:
+        <span class="info-box__value-label">{{ metrics.affected_trades_pct?.toFixed(1) }}%</span>
+      </p>
     </div>
 
     <ChartContainer
@@ -234,3 +249,39 @@ watchEffect(() => {
     </ChartContainer>
   </div>
 </template>
+
+<style scoped lang="scss">
+@use '@/styles/variables';
+
+.info-box {
+  background-color: variables.$color-background-secondary;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 0.5rem;
+  color: variables.$color-text-secondary;
+  border-left: 4px solid variables.$color-border;
+
+  &__value-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: variables.$color-text-primary;
+  }
+
+  h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: variables.$color-text-primary;
+  }
+
+  p {
+    margin: 4px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  p::before {
+    content: '• ';
+    color: variables.$color-text-button-primary;
+  }
+}
+</style>
