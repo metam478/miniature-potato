@@ -1,0 +1,33 @@
+@use "variables";
+
+.card {
+  background-color: variables.$color-background-secondary;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 0.5rem;
+  color: variables.$color-text-secondary;
+  border-left: 4px solid variables.$color-border;
+
+  &__value-label {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: variables.$color-text-primary;
+  }
+
+  h3 {
+    margin-top: 0;
+    font-size: 1.5rem;
+    color: variables.$color-text-primary;
+  }
+
+  p {
+    margin: 4px 0;
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  p::before {
+    content: '• ';
+    color: variables.$color-text-button-primary;
+  }
+}

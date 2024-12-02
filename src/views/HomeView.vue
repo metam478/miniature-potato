@@ -11,3 +11,7 @@ import RealVsSimulatedPnlCurve from '@/components/charts/RealVsSimulatedPnlCurve
     <EvAndWinRate />
   </main>
 </template>
+
+<style scoped lang="scss">
+@use '@/styles/container';
+</style>

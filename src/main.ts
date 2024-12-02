@@ -1,4 +1,3 @@
-import '@vuepic/vue-datepicker/dist/main.css'
 import '@/styles/main.scss'
 import 'floating-vue/dist/style.css'
 
