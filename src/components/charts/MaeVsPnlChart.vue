@@ -56,6 +56,8 @@ const metrics = computed(() => {
   return calculateMetrics(stopLossThrottled.value)
 })
 
+const yAxisText = computed(() => `PnL (${useDollars.value ? '$' : '%'})`)
+
 const formatData = () => {
   return stopLossOptimizer.data.value?.trades.map((trade: Trade) => ({
     x: trade.mae_percent,
@@ -180,7 +182,7 @@ const chartOptions = ref<Options>({
   },
   yAxis: {
     title: {
-      text: `PnL (${useDollars.value ? '$' : '%'})`,
+      text: yAxisText,
     },
   },
   plotOptions: {
