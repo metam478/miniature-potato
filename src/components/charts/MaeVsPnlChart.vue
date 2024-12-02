@@ -182,7 +182,7 @@ const chartOptions = ref<Options>({
   },
   yAxis: {
     title: {
-      text: yAxisText,
+      text: yAxisText as unknown as string,
     },
   },
   plotOptions: {
