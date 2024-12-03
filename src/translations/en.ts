@@ -16,5 +16,5 @@ export default {
   apply: 'Apply',
   ev_and_win_rate_chart_title: 'EV and Win rate % at Different Stop loss Distances',
   real_vs_simulated_pnl_curve_chart_title: 'Real PnL Curve vs Simulated PnL Curve with Stoploss',
-  mae_vs_pnl_chart_title: 'Maximum Adverse Excursion (MAE) vs PnL',
+  mae_vs_pnl_chart_title: 'MAE vs PnL',
 }
