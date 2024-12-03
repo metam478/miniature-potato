@@ -59,13 +59,8 @@ const createChart = () => {
 
   let realPnLBiggerBool = true
 
-  const rootStyle = getComputedStyle(document.documentElement)
-  const colorRed = rootStyle.getPropertyValue('--color-red').trim()
-  const colorGreen = rootStyle.getPropertyValue('--color-green').trim()
-  const colorPrimaryText = rootStyle.getPropertyValue('--color-text-primary').trim()
-
-  const positiveColor = colorGreen,
-    negativeColor = colorRed,
+  const positiveColor = '#22c55e',
+    negativeColor = '#ef4444',
     ranges = [],
     realPnLZones = []
 
@@ -108,12 +103,13 @@ const createChart = () => {
   Highcharts.chart('container', {
     chart: {
       type: 'arearange',
+      backgroundColor: 'transparent',
       styledMode: false,
     },
     title: null,
     legend: {
       itemStyle: {
-        color: colorPrimaryText,
+        color: '#fff',
       },
     },
     xAxis: {
@@ -121,12 +117,12 @@ const createChart = () => {
       title: {
         text: t('date'),
         style: {
-          color: colorPrimaryText,
+          color: '#fff',
         },
       },
       labels: {
         style: {
-          color: colorPrimaryText,
+          color: '#fff',
         },
       },
       tickInterval: Math.floor(timestamps.length / 10),
@@ -135,12 +131,12 @@ const createChart = () => {
       title: {
         text: `${t('cumulative_pnl')} (USD)`,
         style: {
-          color: colorPrimaryText,
+          color: '#fff',
         },
       },
       labels: {
         style: {
-          color: colorPrimaryText,
+          color: '#fff',
         },
         formatter: function () {
           return '$' + this.value.toLocaleString('en-US')
@@ -148,15 +144,8 @@ const createChart = () => {
       },
     },
     tooltip: {
-      // fill: variables.$color-light-300;
-      // set the background color of the tooltip
-      backgroundColor: '#FCFFC5',
       style: {
-        color: '#ffffff',
-        background: '#000000',
-        fill: '#000000',
-
-        // : '#ffffff',
+        color: '#fff',
       },
       shared: true,
       formatter: function (this) {
@@ -173,12 +162,14 @@ const createChart = () => {
         marker: {
           enabled: false,
         },
+        type: 'arearange',
+        fillColor: '#ffffff',
       },
       {
         type: 'line',
         name: 'Real PnL',
         data: cumulativeRealPnL,
-        color: colorRed,
+        color: '#f00',
         marker: {
           enabled: false,
         },
@@ -187,7 +178,7 @@ const createChart = () => {
         type: 'line',
         name: 'Simulated PnL',
         data: cumulativeSimulatedPnL,
-        color: colorGreen,
+        color: '0f0',
         marker: {
           enabled: false,
         },

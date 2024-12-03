@@ -1,8 +1,5 @@
 @use "reset";
 @use 'variables' as *;
-@use "highcharts";
-
-@import url('../../node_modules/highcharts/css/highcharts.css');
 
 body {
   background-color: $color-background-primary;

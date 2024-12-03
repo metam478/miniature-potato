@@ -26,29 +26,50 @@ const stopLossOptimizerSeries = computed(() => {
   ]
 })
 
-const chartTickInterval = computed(() =>
-  stopLossOptimizer.data.value
-    ? Math.floor(stopLossOptimizer.data.value?.mae_ticks?.length / 20)
-    : 0,
+// const chartTickInterval = computed(() =>
+//   stopLossOptimizer.data.value
+//     ? Math.floor(stopLossOptimizer.data.value?.mae_ticks?.length / 10)
+//     : 0,
+// )
+
+const chartCategories = stopLossOptimizer.data.value?.mae_ticks.map(
+  (tick: number) => Number(tick * 100).toFixed(1) + '%',
 )
 
 const chartOptions = ref<Options>({
   chart: {
     type: 'line',
+    styledMode: false,
+    backgroundColor: 'transparent',
   },
   title: {
     text: undefined,
   },
+  legend: {
+    itemStyle: {
+      color: '#fff',
+    },
+  },
   xAxis: {
-    categories: stopLossOptimizer.data.value?.mae_ticks.map(
-      (tick: number) => Number(tick * 100).toFixed(1) + '%',
-    ),
-    tickInterval: chartTickInterval.value,
+    labels: {
+      style: {
+        color: '#fff',
+      },
+    },
+    title: {
+      style: {
+        color: '#fff',
+      },
+    },
+    categories: chartCategories,
   },
   yAxis: [
     {
       title: undefined,
       labels: {
+        style: {
+          color: '#fff',
+        },
         formatter: function () {
           return '$' + this.value.toLocaleString('en-US')
         },
@@ -58,6 +79,9 @@ const chartOptions = ref<Options>({
       title: undefined,
       opposite: true,
       labels: {
+        style: {
+          color: '#fff',
+        },
         formatter: function () {
           return this.value + '%'
         },
@@ -66,6 +90,9 @@ const chartOptions = ref<Options>({
   ],
   tooltip: {
     shared: true,
+    style: {
+      color: '#fff',
+    },
     formatter: function () {
       // @ts-expect-error add custom points interface
       return `<div><b>${t('mae')} %: ${this.key}</b><br/>${t('ev')}: $${this.points[0].y.toLocaleString('en-US')}<br/>Win Rate: ${Number(this.points[1].y).toFixed(2)}%`

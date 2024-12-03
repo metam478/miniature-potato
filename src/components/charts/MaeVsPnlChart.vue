@@ -67,6 +67,16 @@ const formatData = () => {
   }))
 }
 
+const getRadius = (y: number, minRadius = 4, maxRadius = 20) => {
+  const absY = Math.abs(y) // Use absolute value if y can be negative
+  const maxY = Math.max(
+    ...(stopLossOptimizer.data.value?.trades?.map((trade: Trade) =>
+      useDollars.value ? trade.pnl_usd : trade.pnl_percent,
+    ) || []),
+  )
+  return (absY / maxY) * (maxRadius - minRadius) + minRadius
+}
+
 const chartSeries = computed(() => {
   return stopLossOptimizer?.data?.value
     ? [
@@ -77,8 +87,11 @@ const chartSeries = computed(() => {
             x: point.x,
             y: point.y,
             timestamp: point.timestamp,
+            enableMouseTracking: true,
             marker: {
               fillColor: point.color,
+              // set radius based on the y value
+              radius: getRadius(point.y),
             },
           })),
         } as SeriesScatterOptions,
@@ -90,6 +103,8 @@ const chartOptions = ref<Options>({
   chart: {
     type: 'scatter',
     height: '400px',
+    backgroundColor: 'transparent',
+    styledMode: false,
     events: {
       load: function (this: HighchartsChart) {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
@@ -175,24 +190,36 @@ const chartOptions = ref<Options>({
     text: undefined,
   },
   xAxis: {
+    labels: {
+      style: {
+        color: '#fff',
+      },
+    },
     title: {
       text: 'MAE (%)',
+      style: {
+        color: '#fff',
+      },
     },
     min: 0,
   },
   yAxis: {
+    labels: {
+      style: {
+        color: '#fff',
+      },
+    },
     title: {
       text: yAxisText as unknown as string,
-    },
-  },
-  plotOptions: {
-    scatter: {
-      marker: {
-        radius: 5,
+      style: {
+        color: '#fff',
       },
     },
   },
   tooltip: {
+    style: {
+      color: '#fff',
+    },
     formatter: function (this: Point) {
       const point = this.options as ExtendedPoint
 
@@ -217,7 +244,7 @@ watchEffect(() => {
   <div>
     <div class="card">
       <h3>
-        {{ $t('optimal_stop_loss') }}}:
+        {{ $t('optimal_stop_loss') }}:
         {{ stopLossOptimizer.data.value?.optimal_stop.optimal_stoploss }}
       </h3>
 
@@ -226,7 +253,7 @@ watchEffect(() => {
         {{ $t('max_mae') }}: <span class="card__value-label">{{ maxMAE.toFixed(2) }}%</span>
       </p>
       <p>
-        {{ $t('current_expected_value_per_trade') }}}
+        {{ $t('current_expected_value_per_trade') }}:
         <span class="card__value-label">{{ metrics.current_ev?.toFixed(2) }}$</span>
       </p>
       <p>
@@ -237,7 +264,7 @@ watchEffect(() => {
         </span>
       </p>
       <p>
-        {{ $t('affected_trades') }}
+        {{ $t('affected_trades') }}:
         <span class="card__value-label">{{ metrics.affected_trades_pct?.toFixed(1) }}%</span>
       </p>
     </div>
