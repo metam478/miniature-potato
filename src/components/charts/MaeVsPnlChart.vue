@@ -108,7 +108,6 @@ const chartOptions = ref<Options>({
     styledMode: false,
     events: {
       load: async function (this: HighchartsChart) {
-        await nextTick()
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const chart = this
         const lineWidth = 3

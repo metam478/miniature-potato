@@ -27,12 +27,6 @@ const stopLossOptimizerSeries = computed(() => {
   ]
 })
 
-// const chartTickInterval = computed(() =>
-//   stopLossOptimizer.data.value
-//     ? Math.floor(stopLossOptimizer.data.value?.mae_ticks?.length / 10)
-//     : 0,
-// )
-
 const chartCategories = stopLossOptimizer.data.value?.mae_ticks.map(
   (tick: number) => Number(tick * 100).toFixed(1) + '%',
 )

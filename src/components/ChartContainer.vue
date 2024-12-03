@@ -83,6 +83,12 @@ withDefaults(
     display: flex;
     justify-content: space-between;
     margin-bottom: 2rem;
+
+    @media (max-width: 768px) {
+      justify-content: flex-end;
+      flex-direction: column;
+      gap: 1rem;
+    }
   }
 
   &__title {
