@@ -6,6 +6,7 @@ import { Chart } from 'highcharts-vue'
 
 import ChartContainer from '@/components/ChartContainer.vue'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
+import colors from '@/utils/colors.ts'
 const stopLossOptimizer = useStopLossOptimizer()
 
 const { t } = useI18n()
@@ -47,18 +48,18 @@ const chartOptions = ref<Options>({
   },
   legend: {
     itemStyle: {
-      color: '#fff',
+      color: colors.chart.text,
     },
   },
   xAxis: {
     labels: {
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
     title: {
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
     categories: chartCategories,
@@ -68,7 +69,7 @@ const chartOptions = ref<Options>({
       title: undefined,
       labels: {
         style: {
-          color: '#fff',
+          color: colors.chart.text,
         },
         formatter: function () {
           return '$' + this.value.toLocaleString('en-US')
@@ -80,7 +81,7 @@ const chartOptions = ref<Options>({
       opposite: true,
       labels: {
         style: {
-          color: '#fff',
+          color: colors.chart.text,
         },
         formatter: function () {
           return this.value + '%'
@@ -90,8 +91,9 @@ const chartOptions = ref<Options>({
   ],
   tooltip: {
     shared: true,
+    backgroundColor: colors.chart.tooltip.background,
     style: {
-      color: '#fff',
+      color: colors.chart.text,
     },
     formatter: function () {
       // @ts-expect-error add custom points interface

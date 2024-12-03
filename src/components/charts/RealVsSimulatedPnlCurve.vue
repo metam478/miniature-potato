@@ -10,6 +10,7 @@ import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
 import ChartContainer from '@/components/ChartContainer.vue'
 import TSNumberInput from '@/components/UI/TSNumberInput.vue'
+import colors from '@/utils/colors.ts'
 
 const { t } = useI18n()
 const queryClient = useQueryClient()
@@ -109,7 +110,7 @@ const createChart = () => {
     title: null,
     legend: {
       itemStyle: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
     xAxis: {
@@ -117,12 +118,12 @@ const createChart = () => {
       title: {
         text: t('date'),
         style: {
-          color: '#fff',
+          color: colors.chart.text,
         },
       },
       labels: {
         style: {
-          color: '#fff',
+          color: colors.chart.text,
         },
       },
       tickInterval: Math.floor(timestamps.length / 10),
@@ -131,12 +132,12 @@ const createChart = () => {
       title: {
         text: `${t('cumulative_pnl')} (USD)`,
         style: {
-          color: '#fff',
+          color: colors.chart.text,
         },
       },
       labels: {
         style: {
-          color: '#fff',
+          color: colors.chart.text,
         },
         formatter: function () {
           return '$' + this.value.toLocaleString('en-US')
@@ -144,8 +145,9 @@ const createChart = () => {
       },
     },
     tooltip: {
+      backgroundColor: colors.chart.tooltip.background,
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
       shared: true,
       formatter: function (this) {

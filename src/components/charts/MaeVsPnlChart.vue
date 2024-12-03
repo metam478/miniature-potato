@@ -16,6 +16,7 @@ import ChartContainer from '@/components/ChartContainer.vue'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
 import type { ExtendedPoint } from '@/types/highcharts.ts'
+import colors from '@/utils/colors.ts'
 
 const stopLossOptimizer = useStopLossOptimizer()
 
@@ -192,13 +193,13 @@ const chartOptions = ref<Options>({
   xAxis: {
     labels: {
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
     title: {
       text: 'MAE (%)',
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
     min: 0,
@@ -206,19 +207,20 @@ const chartOptions = ref<Options>({
   yAxis: {
     labels: {
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
     title: {
       text: yAxisText as unknown as string,
       style: {
-        color: '#fff',
+        color: colors.chart.text,
       },
     },
   },
   tooltip: {
+    backgroundColor: colors.chart.tooltip.background,
     style: {
-      color: '#fff',
+      color: colors.chart.text,
     },
     formatter: function (this: Point) {
       const point = this.options as ExtendedPoint
