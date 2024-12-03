@@ -170,7 +170,10 @@ watch([stopDistance], () => {
 <template>
   <!--  <input type="number" v-model="stopDistance" />-->
 
-  <ChartContainer :title="$t('real_vs_simulated_pnl_curve_chart_title')">
+  <ChartContainer
+    :title="$t('real_vs_simulated_pnl_curve_chart_title')"
+    :is-loading="stopLossOptimizer.isLoading.value"
+  >
     <template #default>
       <!--      <div id="chart" ref="chartContainer"></div>-->
       <div id="container"></div>
