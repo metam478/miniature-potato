@@ -38,7 +38,7 @@ const model = defineModel<boolean>()
     position: relative;
     width: 24px;
     height: 24px;
-    background-color: variables.$color-light-100;
+    background-color: variables.$color-light-300;
     border-radius: 2px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     transition: all variables.$transition-duration ease;

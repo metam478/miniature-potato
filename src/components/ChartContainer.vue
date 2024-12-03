@@ -20,7 +20,7 @@ withDefaults(
     <div class="chart-container__header">
       <h4 class="chart-container__title">{{ title }}</h4>
 
-      <div style="display: flex; gap: 1rem">
+      <div class="chart-container__actions">
         <slot name="actions" v-if="$slots.actions"> </slot>
         <IInfo v-tooltip="tooltip" />
       </div>
@@ -73,15 +73,21 @@ withDefaults(
   border: variables.$color-border 1px solid;
   background-color: variables.$color-background-secondary;
 
+  &__actions {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+  }
+
   &__header {
     display: flex;
     justify-content: space-between;
+    margin-bottom: 2rem;
   }
 
   &__title {
     font-size: 1.3125rem;
     line-height: 1.75rem;
-    margin-bottom: 2rem;
     color: variables.$color-text-primary;
   }
 }

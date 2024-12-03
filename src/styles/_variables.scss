@@ -3,12 +3,10 @@ $color-dark-100: #1c1c1d;
 $color-dark-150: #1f1f20;
 $color-dark-200: #262627;
 $color-dark-300: #323233;
-$color-dark-400: #929292;
 
 $color-light-100: #fcfefd;
 $color-light-200: #b6b7b6;
-$color-light-300: #676768;
-$color-light-400: #5F5F60;
+$color-light-300: #5F5F60;
 
 // Semantic colors
 $color-red: #c84e64;
@@ -23,16 +21,6 @@ $color-border: $color-dark-300;
 // Text tokens
 $color-text-primary: $color-light-100;
 $color-text-secondary: $color-light-200;
-$color-text-tertiary: $color-light-300;
-
-// Button tokens
-$color-text-button-primary: $color-light-100;
-$color-background-button-primary: $color-green;
-$color-background-button-primary-hover: darken($color-green, 10%);
-
-$color-text-button-secondary: $color-light-100;
-$color-background-button-secondary: $color-blue;
-$color-background-button-secondary-hover: darken($color-blue, 10%);
 
 $color-text-button-tertiary: $color-light-200;
 $color-background-button-tertiary: $color-dark-200;
@@ -45,4 +33,11 @@ $transition-duration: 0.3s;
 :export {
   primary-color: #{$color-light-100};
   secondary-color: #{$color-light-200};
+}
+
+:root {
+  --color-red: #{color-red};
+  --color-green: #{color-green};
+  --color-blue: #{color-blue};
+  --color-text-primary: #{primary-color};
 }

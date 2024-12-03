@@ -9,6 +9,7 @@ import { format } from 'date-fns'
 import { useStopLossOptimizer } from '@/queries/stopLoss.ts'
 import type { Trade } from '@/types/stopLoss.ts'
 import ChartContainer from '@/components/ChartContainer.vue'
+import TSNumberInput from '@/components/UI/TSNumberInput.vue'
 
 const { t } = useI18n()
 const queryClient = useQueryClient()
@@ -58,8 +59,13 @@ const createChart = () => {
 
   let realPnLBiggerBool = true
 
-  const positiveColor = '#bfeebf',
-    negativeColor = '#fde3e3',
+  const rootStyle = getComputedStyle(document.documentElement)
+  const colorRed = rootStyle.getPropertyValue('--color-red').trim()
+  const colorGreen = rootStyle.getPropertyValue('--color-green').trim()
+  const colorPrimaryText = rootStyle.getPropertyValue('--color-text-primary').trim()
+
+  const positiveColor = colorGreen,
+    negativeColor = colorRed,
     ranges = [],
     realPnLZones = []
 
@@ -102,26 +108,56 @@ const createChart = () => {
   Highcharts.chart('container', {
     chart: {
       type: 'arearange',
+      styledMode: false,
     },
     title: null,
+    legend: {
+      itemStyle: {
+        color: colorPrimaryText,
+      },
+    },
     xAxis: {
       categories: timestamps,
       title: {
         text: t('date'),
+        style: {
+          color: colorPrimaryText,
+        },
+      },
+      labels: {
+        style: {
+          color: colorPrimaryText,
+        },
       },
       tickInterval: Math.floor(timestamps.length / 10),
     },
     yAxis: {
       title: {
         text: `${t('cumulative_pnl')} (USD)`,
+        style: {
+          color: colorPrimaryText,
+        },
       },
       labels: {
+        style: {
+          color: colorPrimaryText,
+        },
         formatter: function () {
           return '$' + this.value.toLocaleString('en-US')
         },
       },
     },
     tooltip: {
+      // fill: variables.$color-light-300;
+      // set the background color of the tooltip
+      backgroundColor: '#FCFFC5',
+      style: {
+        color: '#ffffff',
+        background: '#000000',
+        fill: '#000000',
+
+        // : '#ffffff',
+      },
       shared: true,
       formatter: function (this) {
         // @ts-expect-error points is not typed
@@ -142,7 +178,7 @@ const createChart = () => {
         type: 'line',
         name: 'Real PnL',
         data: cumulativeRealPnL,
-        color: '#1c1cff',
+        color: colorRed,
         marker: {
           enabled: false,
         },
@@ -151,7 +187,7 @@ const createChart = () => {
         type: 'line',
         name: 'Simulated PnL',
         data: cumulativeSimulatedPnL,
-        color: '#00b050',
+        color: colorGreen,
         marker: {
           enabled: false,
         },
@@ -159,6 +195,7 @@ const createChart = () => {
     ],
   })
 }
+
 const debouncedCreateChart = useDebounceFn(createChart, 500)
 
 stopLossObserver.subscribe(() => {
@@ -171,12 +208,13 @@ watch([stopDistance], () => {
 </script>
 
 <template>
-  <input type="number" v-model="stopDistance" />
-
   <ChartContainer
     :title="$t('real_vs_simulated_pnl_curve_chart_title')"
     :is-loading="stopLossOptimizer.isLoading.value"
   >
+    <template #actions>
+      <TSNumberInput v-model.number="stopDistance" />
+    </template>
     <template #default>
       <div id="container"></div>
     </template>

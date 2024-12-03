@@ -41,7 +41,7 @@ const setActiveTab = (index: number) => {
   text-align: center;
   cursor: pointer;
   background-color: variables.$color-dark-100;
-  color: variables.$color-light-400;
+  color: variables.$color-light-300;
   border-radius: 2px;
   transition:
     background-color 0.3s,
