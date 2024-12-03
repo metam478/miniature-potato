@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watchEffect } from 'vue'
+import { ref, computed, watchEffect, nextTick } from 'vue'
 import { refThrottled } from '@vueuse/core'
 import { format } from 'date-fns'
 import {
@@ -107,7 +107,8 @@ const chartOptions = ref<Options>({
     backgroundColor: 'transparent',
     styledMode: false,
     events: {
-      load: function (this: HighchartsChart) {
+      load: async function (this: HighchartsChart) {
+        await nextTick()
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const chart = this
         const lineWidth = 3
@@ -122,12 +123,12 @@ const chartOptions = ref<Options>({
           .add()
 
         chart.renderer
-          .path(['M', 0, 0, 'L', 0, chart.plotHeight] as never)
+          .path(['M', 0, 10, 'L', 0, chart.plotHeight + 5] as never)
           .attr({
             'stroke-width': lineWidth,
             'pointer-events': 'all',
             cursor: 'ew-resize',
-            stroke: 'lightgray',
+            stroke: colors.chart.lineStroke,
           })
           .add(draggableLine)
 
